@@ -16,7 +16,7 @@ As of currently, I compile using `g++ 4.2.1` with C++17 support (`-std=c++17`)
 ## Examples
 - Examples can be found under the corresponding folder `Docs/`
 
-## Credit
+## Credits
 - WIP
 
 
