@@ -19,5 +19,7 @@ Currently, I compile using g++ 4.2.1 with C++17
 ## Credits
 - Special thanks to Jonathan Levin for providing an [alternate function](http://newosxbook.com/articles/PST2.html) to `task_for_pid()` 
 
+## License
+This repository uses the **GNU General Public License v3.0**
 
-_Be aware that this repository is a **major** work in progress and is not complete_
+_Be aware that this repository is a major work in progress and is not complete_
