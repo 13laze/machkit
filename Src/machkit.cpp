@@ -94,7 +94,7 @@ void machkit::bind(const std::string &winTitle)
             }
         }
   
-        if(procId > 0) { // nice nest
+        if(procId > 0) { // nice spaghetti code
             this->processId = procId;
             this->task = task_for_pid_workaround(procId); // error checking is implementing in the function but I'll add more here later
 
@@ -104,6 +104,7 @@ void machkit::bind(const std::string &winTitle)
             else {
                 std::cerr << "Error with retreiving the task!" << std::endl;
             }
+		
         }
         else {
             std::cerr << "Error retrieving the proccess id!" << std::endl;
@@ -115,9 +116,7 @@ void machkit::bind(const std::string &winTitle)
 }
 
 
-/*
-    Does what it says it does
-*/
+// writes (untested)
 void machkit::writeto(const mach_vm_address_t addr, const std::vector<unsigned char> &bytes, const std::optional<task_t> &task) // in case the user wants to write to a process manually 
 {
     task_t t = (task.has_value()) ? task.value() : this->task; // Either we can specify our own task or the task generated from the constructor 
@@ -139,7 +138,7 @@ void machkit::writeto(const mach_vm_address_t addr, const std::vector<unsigned c
     }
 }   
 
-// reads
+// reads (untested)
 template <class T>
 void machkit::readfrom(const mach_vm_address_t addr, T* dest, const std::optional<task_t> &task) 
 {
@@ -153,12 +152,12 @@ void machkit::readfrom(const mach_vm_address_t addr, T* dest, const std::optiona
     }
 }
 
-// Source code is similar to https://stackoverflow.com/questions/10301542/getting-process-base-address-in-mac-osx but we don't walk about this
+// does the obvious
 mach_vm_address_t machkit::get_task_base(const std::optional<task_t> &task)
 {
     task_t t = task.has_value() ? task.value() : this->task;
 
-    mach_vm_address_t vmoffset = 0; // base is here owo
+    mach_vm_address_t vmoffset = NULL; // address is found here
     vm_map_size_t vmsize;
     uint32_t nesting_depth = 0;
     vm_region_submap_info_64 vbr;
