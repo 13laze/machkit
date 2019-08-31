@@ -53,7 +53,7 @@ public:
     mach_vm_address_t get_task_base(const std::optional<task_t> &task={});
 
     // undefined temporarly
-    kern_return_t writeto_multiple(const std::tuple<mach_vm_address_t, std::vector<unsigned char>> &pair, const std::optional<mach_port_t> &task={});
+    kern_return_t writeto_multiple(const std::tuple<mach_vm_address_t, std::vector<uint8_t>> &pair, const std::optional<mach_port_t> &task={});
 
     /*
     Writes to an area of memory in a specified process in virtual memory
@@ -61,10 +61,24 @@ public:
     - bytes (std::vector<char>) -> Vector of bytes to write from
     - task (task_t) -> optional task
     */
-    void writeto(const mach_vm_address_t addr, const std::vector<unsigned char> &bytes, const std::optional<task_t> &task={});
+    void writeto(const mach_vm_address_t addr, const std::vector<uint8_t> &bytes, const std::optional<task_t> &task={});
 
-    template <class T>
-    void readfrom(const mach_vm_address_t addr, T* dest, const std::optional<task_t> &task={});
+    // Don't use, thanks
+    template <typename T> // template stuff fixed gg 
+    void readfrom(const mach_vm_address_t addr, T* dest, const std::optional<task_t> &task={}) 
+    {
+        task_t t = (task.has_value()) ? task.value() : this->task;
+        if(!t) { std::cerr << "No task to read from!" << std::endl; } // it'd be a good idea to stop the code exec here
+
+        kern_return_t kerr;
+        mach_msg_type_number_t placeholder = 0; // because no one apprarently has used mach_vm_read before
+
+        // so placeholder is of course, a placeholder, I haven't found any resource explaining mach_vm_read but all I need is the last param
+        if(kerr = mach_vm_read(t, addr, sizeof(T), reinterpret_cast<vm_offset_t*>(dest), &placeholder)); kerr != KERN_SUCCESS) {
+            std::cerr << "Unable to read address " << std::hex << addr << std::endl;
+            std::cerr << "Error: " << mach_error_string(kerr) << std::endl;
+        }
+    }
 
     // Verifies whether the user is running as superuser
     const bool hasPermissions();
