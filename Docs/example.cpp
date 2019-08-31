@@ -3,9 +3,11 @@
 int main()
 {
     machkit mkit; // instantiate a new machkit object
-    mkit.bind("firefox"); // we can either call the bind function manually or call it through the constructor
+    mkit.bind("GeometryDash.exe"); // we can either call the bind function manually or call it through the constructor
 
-    // Example
-    std::cout << mkit.windowTitle << " has pid " << mkit.processId << std::endl;
-    std::cout << "Base is: 0x" << std::hex << mkit.base << std::endl;
+    mach_vm_address_t a = 0x2103428;
+    int val;
+
+    mkit.readfrom<int>(a, &val);
+    std::cout << "Current attempt is " << val << std::endl;
 }
