@@ -49,7 +49,7 @@ mach_port_t task_for_pid_workaround(pid_t Pid)
 */
 machkit::machkit(const std::optional<std::string> &windowTitle) 
 {
-    this->task = MACH_PORT_NULL, this->base = NULL, this->processId = NULL;
+    this->task = MACH_PORT_NULL, this->base = 0, this->processId = 0;
 
     if(!this->hasPermissions()) {  // Permission stuff y'know the usual
         std::cout << "MachKit does not have enough permissions to run! Please run the binary as an superuser to continue!" << std::endl;
@@ -83,18 +83,18 @@ void machkit::bind(const std::string &winTitle)
         pid_t procId = 0;
         std::array<pid_t, 2048> pids {};
 
-        proc_listpids(PROC_ALL_PIDS, NULL, &pids, sizeof(pids)); // proc_listpids returns a buffer of actual bytes for pids
+        proc_listpids(PROC_ALL_PIDS, 0, &pids, sizeof(pids)); // proc_listpids returns a buffer of actual bytes for pids
 
         for(const auto &pid : pids) {
             proc_bsdinfo pinfo; // struct which contains info on the process
-            proc_pidinfo(pid, PROC_PIDTBSDINFO, NULL, &pinfo, sizeof(proc_bsdinfo)); // proc_pidinfo returns buffer of size of proc_bsdinfo(?)
+            proc_pidinfo(pid, PROC_PIDTBSDINFO, 0, &pinfo, sizeof(proc_bsdinfo)); // proc_pidinfo returns buffer of size of proc_bsdinfo(?)
 
             if(!strcmp(winTitle.c_str(), pinfo.pbi_name)) { // check if the name f the specified process is equal to the pid proc name
                 procId = pid; // pinfo.pbi_pid works just as fine 
             }
         }
   
-        if(procId > 0) { // nice spaghetti code
+        if(procId > 0) { // nice nest
             this->processId = procId;
             this->task = task_for_pid_workaround(procId); // error checking is implementing in the function but I'll add more here later
 
@@ -104,7 +104,6 @@ void machkit::bind(const std::string &winTitle)
             else {
                 std::cerr << "Error with retreiving the task!" << std::endl;
             }
-		
         }
         else {
             std::cerr << "Error retrieving the proccess id!" << std::endl;
@@ -116,8 +115,8 @@ void machkit::bind(const std::string &winTitle)
 }
 
 
-// writes (untested)
-void machkit::writeto(const mach_vm_address_t addr, const std::vector<unsigned char> &bytes, const std::optional<task_t> &task) // in case the user wants to write to a process manually 
+// partially untested though compiles
+void machkit::writeto(const mach_vm_address_t addr, const std::vector<uint8_t> &bytes, const std::optional<task_t> &task) // in case the user wants to write to a process manually 
 {
     task_t t = (task.has_value()) ? task.value() : this->task; // Either we can specify our own task or the task generated from the constructor 
     if(!t) { std::cerr << "No task to write to!" << std::endl; } // check here haduadiahb kaiw
@@ -138,26 +137,12 @@ void machkit::writeto(const mach_vm_address_t addr, const std::vector<unsigned c
     }
 }   
 
-// reads (untested)
-template <class T>
-void machkit::readfrom(const mach_vm_address_t addr, T* dest, const std::optional<task_t> &task) 
-{
-    task_t t = (task.has_value()) ? task.value() : this->task;
-    if(!t) { std::cerr << "No task to read from!" << std::endl; } // check here haduadiahb kaiw
-
-    kern_return_t kerr;
-    if(kerr = mach_vm_read(t, addr, sizeof(T), dest, sizeof(T)); kerr != KERN_SUCCESS) {
-        std::cerr << "Unable to read address " << std::hex << addr << std::endl;
-        std::cerr << "Error: " << mach_error_string(kerr) << std::endl;
-    }
-}
-
-// does the obvious
+// untested
 mach_vm_address_t machkit::get_task_base(const std::optional<task_t> &task)
 {
     task_t t = task.has_value() ? task.value() : this->task;
 
-    mach_vm_address_t vmoffset = NULL; // address is found here
+    mach_vm_address_t vmoffset = 0; // base is here 
     vm_map_size_t vmsize;
     uint32_t nesting_depth = 0;
     vm_region_submap_info_64 vbr;
