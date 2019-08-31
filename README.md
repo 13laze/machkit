@@ -4,9 +4,8 @@ MachKit is an in progress mach library wrapper written in C++
 
 ## WIP
 - [ ] Complete Basic Wrapper 
-- [ ] Dylib Injection
+- [ ] .so/.dylib Injection
 - [ ] Hooking
-- [ ] Function Signature Functionality
 - [ ] Getting Program Information
 - [ ] CMake building
 
