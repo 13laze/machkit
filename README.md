@@ -10,7 +10,6 @@ MachKit is an in progress mach library wrapper written in C++
 - [ ] CMake building
 
 ## Building
-Currently, I compile using g++ 4.2.1 with C++17
 
 ## Examples
 - Examples can be found under the corresponding folder `Docs/`
